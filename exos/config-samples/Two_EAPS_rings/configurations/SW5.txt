@@ -1,0 +1,57 @@
+#
+# Module devmgr configuration.
+#
+configure snmp sysName "SW5"
+
+#
+# Module vlan configuration.
+#
+configure vlan default delete ports all
+create vlan "Data"
+configure vlan Data tag 10
+create vlan "Left_C_EAPS"
+configure vlan Left_C_EAPS tag 20
+create vlan "Right_C_EAPS"
+configure vlan Right_C_EAPS tag 30
+configure vlan Data add ports 2-3,5 tagged
+configure vlan Left_C_EAPS add ports 2,5 tagged
+configure vlan Right_C_EAPS add ports 3,5 tagged
+
+#
+# Module dot1ag configuration.
+#
+create cfm domain string "eaps_cfm" md-level 4
+configure cfm domain "eaps_cfm" add association string "eaps_ring" vlan "Left_C_EAPS"
+configure cfm domain "eaps_cfm" add association string "right_eaps_ring" vlan "Right_C_EAPS"
+configure cfm domain "eaps_cfm" association "eaps_ring" ports 2 add end-point down 54
+configure cfm domain "eaps_cfm" association "eaps_ring" ports 5 add end-point down 52
+configure cfm domain "eaps_cfm" association "right_eaps_ring" ports 3 add end-point down 56
+configure cfm domain "eaps_cfm" association "eaps_ring" ports 5 end-point down add group "s5-s2"
+configure cfm domain "eaps_cfm" association "eaps_ring" ports 2 end-point down add group "s5-s4"
+configure cfm domain "eaps_cfm" association "right_eaps_ring" ports 3 end-point down add group "s5-s6"
+configure cfm group "s5-s2" add rmep 25
+configure cfm group "s5-s4" add rmep 45
+
+#
+# Module eaps configuration.
+#
+enable eaps
+create eaps Left_domain
+configure eaps Left_domain mode transit
+configure eaps Left_domain primary port 5
+configure eaps Left_domain secondary port 2
+enable eaps Left_domain
+create eaps Right_domain
+configure eaps Right_domain mode transit
+configure eaps Right_domain primary port 5
+configure eaps Right_domain secondary port 3
+enable eaps Right_domain
+configure eaps Left_domain add protected vlan Data
+configure eaps Left_domain add control vlan Left_C_EAPS
+configure eaps Right_domain add protected vlan Data
+configure eaps Right_domain add control vlan Right_C_EAPS
+create eaps shared-port 5
+configure eaps shared-port 5 mode partner
+configure eaps shared-port 5 link-id 5
+configure eaps cfm add group s5-s2
+configure eaps cfm add group s5-s6

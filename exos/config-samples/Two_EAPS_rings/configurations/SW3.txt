@@ -1,0 +1,43 @@
+SW3.3 # show configuration
+#
+# Module devmgr configuration.
+#
+configure snmp sysName "SW3"
+
+#
+# Module vlan configuration.
+#
+configure vlan default delete ports all
+create vlan "Data"
+configure vlan Data tag 10
+create vlan "Right_C_EAPS"
+configure vlan Right_C_EAPS tag 30
+configure vlan Data add ports 1,3 tagged
+configure vlan Data add ports 10 untagged
+configure vlan Right_C_EAPS add ports 1,3 tagged
+
+#
+# Module dot1ag configuration.
+#
+create cfm domain string "eaps_cfm" md-level 4
+configure cfm domain "eaps_cfm" add association string "right_eaps_ring" vlan "Right_C_EAPS"
+configure cfm domain "eaps_cfm" association "right_eaps_ring" ports 1 add end-point down 36
+configure cfm domain "eaps_cfm" association "right_eaps_ring" ports 3 add end-point down 32
+configure cfm domain "eaps_cfm" association "right_eaps_ring" ports 3 end-point down add group "s2-s3"
+configure cfm domain "eaps_cfm" association "right_eaps_ring" ports 1 end-point down add group "s3-s6"
+configure cfm group "s2-s3" add rmep 23
+configure cfm group "s3-s6" add rmep 63
+
+#
+# Module eaps configuration.
+#
+enable eaps
+create eaps Right_domain
+configure eaps Right_domain mode master
+configure eaps Right_domain primary port 1
+configure eaps Right_domain secondary port 3
+enable eaps Right_domain
+configure eaps Right_domain add protected vlan Data
+configure eaps Right_domain add control vlan Right_C_EAPS
+configure eaps cfm add group s3-s6
+

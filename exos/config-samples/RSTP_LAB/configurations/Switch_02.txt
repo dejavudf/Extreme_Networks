@@ -1,0 +1,31 @@
+#
+# Module devmgr configuration.
+#
+configure snmp sysName "Switch_02"
+
+#
+# Module vlan configuration.
+#
+configure vlan default delete ports all
+create vlan "voip"
+configure vlan voip tag 46
+configure vlan Default add ports 1-12 untagged
+configure vlan voip add ports 3-4,11 tagged
+
+#
+# Module stp configuration.
+#
+configure stpd s0 mode dot1w
+enable stpd s0 auto-bind vlan voip
+configure stpd s0 ports link-type point-to-point 1
+configure stpd s0 ports link-type point-to-point 2
+configure stpd s0 ports link-type point-to-point 3
+configure stpd s0 ports link-type point-to-point 4
+configure stpd s0 ports link-type point-to-point 5
+configure stpd s0 ports link-type point-to-point 6
+configure stpd s0 ports link-type point-to-point 7
+configure stpd s0 ports link-type point-to-point 8
+configure stpd s0 ports link-type point-to-point 9
+configure stpd s0 ports link-type point-to-point 10
+enable stpd s0
+

@@ -1,0 +1,42 @@
+#
+# Module devmgr configuration.
+#
+configure snmp sysName "SW1"
+
+#
+# Module vlan configuration.
+#
+configure vlan default delete ports all
+create vlan "Data"
+configure vlan Data tag 10
+create vlan "Left_C_EAPS"
+configure vlan Left_C_EAPS tag 20
+configure vlan Data add ports 1-2 tagged
+configure vlan Left_C_EAPS add ports 1-2 tagged
+
+#
+# Module dot1ag configuration.
+#
+create cfm domain string "eaps_cfm" md-level 4
+configure cfm domain "eaps_cfm" add association string "eaps_ring" vlan "Left_C_EAPS"
+configure cfm domain "eaps_cfm" association "eaps_ring" ports 1 add end-point down 14
+configure cfm domain "eaps_cfm" association "eaps_ring" ports 2 add end-point down 12
+configure cfm domain "eaps_cfm" association "eaps_ring" ports 2 end-point down add group "s1-s2"
+configure cfm domain "eaps_cfm" association "eaps_ring" ports 1 end-point down add group "s1-s4"
+configure cfm group "s1-s2" add rmep 21
+configure cfm group "s1-s4" add rmep 41
+
+#
+# Module eaps configuration.
+#
+enable eaps
+create eaps Left_domain
+configure eaps Left_domain mode master
+configure eaps Left_domain primary port 1
+configure eaps Left_domain secondary port 2
+enable eaps Left_domain
+configure eaps Left_domain add protected vlan Data
+configure eaps Left_domain add control vlan Left_C_EAPS
+configure eaps cfm add group s1-s2
+configure eaps cfm add group s1-s4
+

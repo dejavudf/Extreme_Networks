@@ -1,0 +1,14 @@
+---
+- name: Disable Telnet
+  hosts: "{{ host }}"
+  gather_facts: no
+
+  vars:
+    host: "{{ inventory_hostname }}"
+    ansible_connection: network_cli
+
+  tasks:
+    - name: Disable Telnet
+      exos_config:
+        lines:
+          - "disable telnet"

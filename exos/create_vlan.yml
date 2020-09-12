@@ -1,0 +1,17 @@
+---
+- name: Verify and provision VLANs
+  hosts: "{{ host }}"
+  gather_facts: no
+
+  vars:
+    host: "{{ inventory_hostname }}"
+    ansible_connection: network_cli
+  vars_files:
+    - vars/vlans.dat
+
+  tasks:
+    - name: Create new VLANs with correct names
+      exos_config:
+        lines:
+          - "create vlan {{ item.name }} tag {{ item.vlan_id }}"
+      with_items: "{{ vlans }}"
